@@ -44,7 +44,8 @@ public class OrderController {
                 .state(States.ORDER_WAIT_PAY.toString())
                 .build();
         orderService.save(build);
-        MessageBuilder.withPayload(Events.PAY_ORDER).setHeader("orderId", build.getId()).build();
+        Message<Events> orderId = MessageBuilder.withPayload(Events.PAY_ORDER).setHeader("orderId", build.getId()).build();
+        changeStateAction(orderId, build);
         OrderPO byId = orderService.getById(build.getId());
         return ResultUtils.success(byId);
     }
@@ -56,13 +57,10 @@ public class OrderController {
         try {
             //启动状态机
             orderStateMachine.start();
-            //从Redis缓存中读取状态机，缓存的Key为orderId+"STATE"，这是自定义的，读者可以根据自己喜好定义
-            OrderPO byId = orderService.getById(message.getHeaders().get("orderId").toString());
             //将Message发送给OrderStateListener
             boolean res = orderStateMachine.sendEvent(message);
-            //将更改完订单状态的 状态机 存储到 Redis缓存
-            byId.setState(message.getPayload().toString());
-            orderService.save(byId);
+            order.setState(message.getPayload().toString());
+            orderService.save(order);
             return res;
         } catch (Exception e) {
             e.printStackTrace();
