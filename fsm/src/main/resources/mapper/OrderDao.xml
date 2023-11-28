@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.atluofu.fsm.dao.OrderDao">
+
+    <resultMap type="top.atluofu.fsm.po.OrderPO" id="OrderPOMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="orderName" column="order_name" jdbcType="VARCHAR"/>
+        <result property="state" column="state" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="id" >
+        insert into demo.order(order_name, state)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.id}, #{entity.orderName}, #{entity.state})
+        </foreach>
+    </insert>
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="id">
+        insert into demo.order(order_name, state)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.id}, #{entity.orderName}, #{entity.state})
+        </foreach>
+        on duplicate key update
+         order_name = values(order_name) , state = values(state)     </insert>
+
+</mapper>
+
