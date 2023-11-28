@@ -43,7 +43,9 @@ public class OrderController {
                 .orderName(name)
                 .state(States.ORDER_WAIT_PAY.toString())
                 .build();
-        orderService.save(build);
+        boolean save = orderService.save(build);
+        System.out.println(save);
+        System.out.println(build);
         Message<Events> orderId = MessageBuilder.withPayload(Events.PAY_ORDER).setHeader("orderId", build.getId()).build();
         changeStateAction(orderId, build);
         OrderPO byId = orderService.getById(build.getId());
@@ -60,7 +62,7 @@ public class OrderController {
             //将Message发送给OrderStateListener
             boolean res = orderStateMachine.sendEvent(message);
             order.setState(message.getPayload().toString());
-            orderService.save(order);
+            orderService.updateById(order);
             return res;
         } catch (Exception e) {
             e.printStackTrace();
