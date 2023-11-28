@@ -1,13 +1,19 @@
 package top.atluofu.fsm.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.statemachine.StateMachineContext;
+import org.springframework.statemachine.StateMachinePersist;
 import org.springframework.statemachine.config.EnableStateMachine;
 import org.springframework.statemachine.config.EnumStateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
+import org.springframework.statemachine.persist.DefaultStateMachinePersister;
+import org.springframework.statemachine.persist.StateMachinePersister;
 import top.atluofu.fsm.listener.OrderStateListener;
 import top.atluofu.fsm.model.Events;
 import top.atluofu.fsm.model.States;
+import top.atluofu.fsm.po.OrderPO;
 
 import java.util.EnumSet;
 
@@ -48,5 +54,21 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
                 .and()
                 .withExternal()
                 .source(States.ORDER_WAIT_RECEIVE).target(States.ORDER_FINISH).event(Events.RECEIVE_ORDER);
+    }
+
+    @Bean
+    public StateMachinePersister<States, Events, OrderPO> persister() {
+        return new DefaultStateMachinePersister<>(new StateMachinePersist<States, Events, OrderPO>() {
+
+            @Override
+            public void write(StateMachineContext<States, Events> stateMachineContext, OrderPO orderPO) throws Exception {
+
+            }
+
+            @Override
+            public StateMachineContext<States, Events> read(OrderPO orderPO) throws Exception {
+                return null;
+            }
+        });
     }
 }

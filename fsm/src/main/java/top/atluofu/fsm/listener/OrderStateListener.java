@@ -31,5 +31,22 @@ public class OrderStateListener {
         OrderPO byId = orderService.getById(Objects.requireNonNull(message.getHeaders().get("orderId")).toString());
         byId.setState(States.ORDER_WAIT_SEND.toString());
         orderService.save(byId);
+        System.out.println("listener" + byId);
+    }
+
+    @OnTransition(source = "ORDER_WAIT_SEND", target = "ORDER_WAIT_RECEIVE")
+    public void sendToReceive(Message<States> message) {
+        OrderPO byId = orderService.getById(Objects.requireNonNull(message.getHeaders().get("orderId")).toString());
+        byId.setState(States.ORDER_WAIT_RECEIVE.toString());
+        orderService.save(byId);
+        System.out.println("listener" + byId);
+    }
+
+    @OnTransition(source = "ORDER_WAIT_RECEIVE", target = "ORDER_FINISH")
+    public void toEnd(Message<States> message) {
+        OrderPO byId = orderService.getById(Objects.requireNonNull(message.getHeaders().get("orderId")).toString());
+        byId.setState(States.ORDER_FINISH.toString());
+        orderService.save(byId);
+        System.out.println("listener" + byId);
     }
 }

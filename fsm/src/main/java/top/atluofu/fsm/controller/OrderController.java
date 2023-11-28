@@ -46,9 +46,22 @@ public class OrderController {
         boolean save = orderService.save(build);
         System.out.println(save);
         System.out.println(build);
+        System.out.println("---------------------");
         Message<Events> orderId = MessageBuilder.withPayload(Events.PAY_ORDER).setHeader("orderId", build.getId()).build();
         changeStateAction(orderId, build);
         OrderPO byId = orderService.getById(build.getId());
+        System.out.println(byId);
+        System.out.println("---------------------");
+        orderId = MessageBuilder.withPayload(Events.SEND_ORDER).setHeader("orderId", build.getId()).build();
+        changeStateAction(orderId, build);
+        byId = orderService.getById(build.getId());
+        System.out.println(byId);
+        System.out.println("---------------------");
+        orderId = MessageBuilder.withPayload(Events.RECEIVE_ORDER).setHeader("orderId", build.getId()).build();
+        changeStateAction(orderId, build);
+        byId = orderService.getById(build.getId());
+        System.out.println(byId);
+        System.out.println("---------------------");
         return ResultUtils.success(byId);
     }
 
@@ -61,8 +74,7 @@ public class OrderController {
             orderStateMachine.start();
             //将Message发送给OrderStateListener
             boolean res = orderStateMachine.sendEvent(message);
-            order.setState(message.getPayload().toString());
-            orderService.updateById(order);
+
             return res;
         } catch (Exception e) {
             e.printStackTrace();
