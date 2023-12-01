@@ -25,13 +25,14 @@ public class OrderStateMachineFactoryConfig extends StateMachineConfigurerAdapte
                 .initial(States.ORDER_WAIT_PAY.toString())
                 .state(States.ORDER_WAIT_SEND.toString())
                 .state(States.ORDER_WAIT_RECEIVE.toString())
-                .end(States.ORDER_FINISH.toString());
+                .state(States.ORDER_FINISH.toString());
     }
 
     @Override
     public void configure(StateMachineTransitionConfigurer<String, String> transitions)
             throws Exception {
-        transitions.withExternal()
+        transitions
+                .withExternal()
                 .source(States.ORDER_WAIT_PAY.toString())
                 .target(States.ORDER_WAIT_SEND.toString())
                 .event(Events.PAY_ORDER.toString())

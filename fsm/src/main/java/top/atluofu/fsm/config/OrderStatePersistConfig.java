@@ -21,16 +21,20 @@ import top.atluofu.fsm.listener.OrderStatePersistChangeListener;
 public class OrderStatePersistConfig {
     @Autowired
     private StateMachineFactory<String, String> orderStateMachineFactory;
-    @Autowired
-    private OrderStatePersistChangeListener persistStateChangeListener;
+
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public PersistStateMachineHandler getPersistStateMachineHandler() {
         StateMachine<String, String> orderStateMachine = orderStateMachineFactory.getStateMachine();
         PersistStateMachineHandler handler = new PersistStateMachineHandler(orderStateMachine);
-        handler.addPersistStateChangeListener(persistStateChangeListener);
+        handler.addPersistStateChangeListener(persistStateChangeListener());
         return handler;
+    }
+
+    @Bean
+    public OrderStatePersistChangeListener persistStateChangeListener() {
+        return new OrderStatePersistChangeListener();
     }
 
 }
